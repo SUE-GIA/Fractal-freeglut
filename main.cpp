@@ -1,5 +1,3 @@
-//IMPLEMENT CASE ONE TO CHANGE EVERY POINTS COLOR REPEATEDLY
-
 #include <GL\glut.h>
 
 int points = 12000;
@@ -27,6 +25,10 @@ void drawShape(GLfloat vertices[][2], int numVertices) {
         q[0] = (q[0] + vertices[j][0]) * r;
         q[1] = (q[1] + vertices[j][1]) * r;
 
+        if (points == 15000) {
+            glColor3f(randomNumber(), randomNumber(), randomNumber());
+        }
+
         glBegin(GL_POINTS);
         glVertex2fv(q);
         glEnd();
@@ -40,8 +42,9 @@ void menu(int choice) {
     switch (choice) {
     case 1:
         // 15000 points, random color
-        glColor3f(randomNumber(), randomNumber(), randomNumber());
+        //glColor3f(randomNumber(), randomNumber(), randomNumber()); //stin periptwsh pou h ekfwnisi thelei olo to sxhma me idio xrwma
         points = 15000;
+        glutPostRedisplay();
         break;
     case 2:
         // r=1/3, hexagon
@@ -58,6 +61,7 @@ void menu(int choice) {
         exit(0);
     case 5:
         points = 12000;
+        glColor3f(0.0, 0.0, 0.0);
     }
 
     glutPostRedisplay();
@@ -137,7 +141,7 @@ int main(int argc, char** argv) {
 
     glutInitWindowSize(700, 700);
 
-    glutInitWindowPosition(800, 200);
+    glutInitWindowPosition(0, 0);
 
     glutCreateWindow("Graphics 1st Project - Fractals");
 
@@ -152,6 +156,7 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Hexagon, r=1/3", 2);
     glutAddMenuEntry("Pentagon, r=3/8", 3);
     glutAddMenuEntry("Quit", 4);
+    glutAddMenuEntry("Original 12000 points, black", 5);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     myinit();
