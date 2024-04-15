@@ -1,10 +1,17 @@
+//Stefanos Panagiotis Giannakos 3568
+//Added a refresh update function for the random colors
+
 #include <GL\glut.h>
+#include <stdlib.h>
+#include <time.h>
 
 int points = 12000;
 int id = 5;
 float r = 0.33333333333;
 int potitionX, potitionY;
 int lastPX = 0, lastPY = 0;
+int activeMenuItem = 0; 
+int pauseRefresh = 0; // Flag that controls the refresh update
 
 //random number generator between 0.0-1.0
 double randomNumber() {
@@ -17,7 +24,6 @@ void drawShape(GLfloat vertices[][2], int numVertices) {
 
     int i, j;
     point2 q = { 300.0, 500.0 };
-    glClear(GL_COLOR_BUFFER_BIT);
 
     for (i = 0; i < points; i++) {
         j = rand() % numVertices;
@@ -26,8 +32,13 @@ void drawShape(GLfloat vertices[][2], int numVertices) {
         q[1] = (q[1] + vertices[j][1]) * r;
 
         if (points == 15000) {
+            // Set random color for each point only when "15000 points, random color" is active
             glColor3f(randomNumber(), randomNumber(), randomNumber());
         }
+        else {
+            glColor3f(0.0, 0.0, 0.0);
+        }
+        
 
         glBegin(GL_POINTS);
         glVertex2fv(q);
@@ -37,31 +48,40 @@ void drawShape(GLfloat vertices[][2], int numVertices) {
     glFlush();
 }
 
+// Continuous update function
+void update(int value) {
+    if (!pauseRefresh) {
+        glutPostRedisplay(); // Redraw the scene
+    }
+    glutTimerFunc(1000 / 60, update, 0); // Update 60 frames per
+}
+
 //show the menu
 void menu(int choice) {
     switch (choice) {
     case 1:
-        // 15000 points, random color
-        //glColor3f(randomNumber(), randomNumber(), randomNumber()); //stin periptwsh pou h ekfwnisi thelei olo to sxhma me idio xrwma
         points = 15000;
-        glutPostRedisplay();
+        activeMenuItem = 1;
+        pauseRefresh = 0; // Unpause the refresh update
+        glutTimerFunc(0, update, 0);
         break;
     case 2:
-        // r=1/3, hexagon
         r = 0.33333333333;
         id = 2;
+        activeMenuItem = 0; 
         break;
     case 3:
-        // r=3/8, Pentagon
         r = 0.375;
         id = 3;
+        activeMenuItem = 0; 
         break;
     case 4:
-        // quit
         exit(0);
     case 5:
         points = 12000;
-        glColor3f(0.0, 0.0, 0.0);
+        activeMenuItem = 0; 
+        pauseRefresh = 1; // Pause the refresh update
+        break;
     }
 
     glutPostRedisplay();
@@ -94,7 +114,7 @@ void RightDrag(int x, int y) {
 void myinit(void) {
 
     glEnable(GL_BLEND);
-    glClearColor(1.0, 1.0, 1.0, 0.0); // white backr
+    glClearColor(1.0, 1.0, 1.0, 0.0); // white background
     glColor3f(0.0, 0.0, 0.0); // black hexagon at init/on
 
     glMatrixMode(GL_PROJECTION);
@@ -102,6 +122,8 @@ void myinit(void) {
     gluOrtho2D(0.0, 700.0, 0.0, 700.0);
     glMatrixMode(GL_MODELVIEW);
 
+    // Seed the random number generator
+    srand(time(NULL));
 }
 
 void display(void) {
@@ -110,12 +132,12 @@ void display(void) {
 
     if (id == 2 || id == 5) {
         GLfloat hexagonVertices[][2] = {
-    {450.0, 575.0},   // Vertex 1
-    {700.0, 450.0},   // Vertex 2
-    {950.0, 575.0},   // Vertex 3
-    {950.0, 825.0},   // Vertex 4
-    {700.0, 950.0},   // Vertex 5
-    {450.0, 825.0}    // Vertex 6
+            {450.0, 575.0},   // Vertex 1
+            {700.0, 450.0},   // Vertex 2
+            {950.0, 575.0},   // Vertex 3
+            {950.0, 825.0},   // Vertex 4
+            {700.0, 950.0},   // Vertex 5
+            {450.0, 825.0}    // Vertex 6
         };
 
         drawShape(hexagonVertices, 6);
@@ -160,6 +182,9 @@ int main(int argc, char** argv) {
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     myinit();
+
+     
+    
 
     glutMainLoop();
 
